@@ -1,8 +1,20 @@
-export default function CheckinPage() {
-  return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2">
-      <h1 className="text-2xl font-semibold">Check-in du jour</h1>
-      <p className="text-zinc-500 text-sm">Formulaire à venir.</p>
-    </div>
-  )
+import { redirect } from 'next/navigation'
+import { getProfile, createAdminClient } from '@/lib/supabase/server'
+import { CheckinForm, type Member } from './CheckinForm'
+
+export default async function CheckinPage() {
+  const profile = await getProfile()
+  if (!profile) redirect('/join')
+
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, prenom')
+    .eq('group_id', profile.group_id)
+    .neq('id', profile.id)
+    .order('prenom')
+
+  const members: Member[] = data ?? []
+
+  return <CheckinForm members={members} />
 }
