@@ -18,6 +18,7 @@ export type Profile = {
   avatar_url: string | null
   session_token: string
   created_at: string
+  last_feed_view_at: string | null
 }
 
 /**
@@ -34,7 +35,7 @@ export async function getProfile(): Promise<Profile | null> {
   const supabase = createAdminClient()
   const { data } = await supabase
     .from('profiles')
-    .select('id, group_id, prenom, avatar_url, session_token, created_at')
+    .select('id, group_id, prenom, avatar_url, session_token, created_at, last_feed_view_at')
     .eq('session_token', token)
     .maybeSingle()
 

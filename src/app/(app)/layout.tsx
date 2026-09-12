@@ -1,6 +1,8 @@
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getProfile } from '@/lib/supabase/server'
 import { LogoutButton } from '@/components/LogoutButton'
+import { FeedBadge } from './FeedBadge'
 
 export default async function AppLayout({
   children,
@@ -16,7 +18,12 @@ export default async function AppLayout({
         <span className="font-semibold text-sm shrink-0">Margar is in Shape</span>
         <nav className="flex gap-4 text-sm flex-wrap">
           <a href="/dashboard" className="hover:underline">Accueil</a>
-          <a href="/feed" className="hover:underline">Fil</a>
+          <a href="/feed" className="hover:underline inline-flex items-center">
+            Fil
+            <Suspense fallback={null}>
+              <FeedBadge />
+            </Suspense>
+          </a>
           <a href="/checkin" className="hover:underline">Check-in</a>
           <a href="/classement" className="hover:underline">Classement</a>
           <a href="/historique" className="hover:underline">Historique</a>

@@ -6,6 +6,15 @@ function generatePin(): string {
   return String(Math.floor(100000 + Math.random() * 900000))
 }
 
+/** Must match the DB generated column: lower(unaccent(prenom)). */
+function normalizePrenom(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
 export async function POST(request: NextRequest) {
   const body: Record<string, string> = await request.json()
   const supabase = createAdminClient()
@@ -87,12 +96,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'PIN invalide.' }, { status: 400 })
     }
 
-    // Find existing profile or create a new one
+    // Find existing profile by normalized prenom (accent- and case-insensitive)
     const { data: existing } = await supabase
       .from('profiles')
       .select('id')
       .eq('group_id', group.id)
-      .eq('prenom', prenom)
+      .eq('prenom_normalized', normalizePrenom(prenom))
       .maybeSingle()
 
     const sessionToken = generateSessionToken()
@@ -109,6 +118,12 @@ export async function POST(request: NextRequest) {
         session_token: sessionToken,
       })
       if (profileError) {
+        if (profileError.code === '23505') {
+          return NextResponse.json(
+            { error: 'Ce prénom est déjà utilisé dans ce groupe (vérifiez la casse et les accents).' },
+            { status: 409 }
+          )
+        }
         return NextResponse.json({ error: profileError.message }, { status: 500 })
       }
     }
