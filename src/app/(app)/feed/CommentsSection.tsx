@@ -4,23 +4,25 @@ import { useState, useTransition, useRef } from 'react'
 import type { FeedComment } from './types'
 import { addComment } from '@/app/actions/feed'
 
-const ALIMENTATION_LABEL: Record<string, string> = {
+export const ALIMENTATION_LABEL: Record<string, string> = {
   super_healthy: 'Super Healthy',
   ca_va: 'En vrai ça va',
   faute: "J'ai fauté",
 }
 
-function formatDateFr(dateStr: string): string {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+// Deterministic pastel colour per first letter of prenom
+const AVATAR_PALETTES = [
+  'bg-orange-100 text-orange-700',
+  'bg-blue-100 text-blue-700',
+  'bg-emerald-100 text-emerald-700',
+  'bg-purple-100 text-purple-700',
+  'bg-pink-100 text-pink-700',
+  'bg-amber-100 text-amber-700',
+]
 
-export { ALIMENTATION_LABEL, formatDateFr }
+function avatarClass(prenom: string): string {
+  return AVATAR_PALETTES[prenom.charCodeAt(0) % AVATAR_PALETTES.length]
+}
 
 export function CommentsSection({
   checkinId,
@@ -57,28 +59,37 @@ export function CommentsSection({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {!expanded && hiddenCount > 0 && (
         <button
           onClick={() => setExpanded(true)}
-          className="text-xs text-zinc-400 hover:text-zinc-600 self-start"
+          className="self-start text-xs font-medium text-muted hover:text-ink transition-colors"
         >
           Voir {hiddenCount} commentaire{hiddenCount > 1 ? 's' : ''} de plus
         </button>
       )}
 
       {visible.length > 0 && (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-2.5">
           {visible.map((c) => (
-            <p key={c.id} className="text-sm">
-              <span className="font-medium">{c.prenom}</span>{' '}
-              <span className="text-zinc-700">{c.texte}</span>
-            </p>
+            <div key={c.id} className="flex items-start gap-2.5">
+              {/* Avatar initiale */}
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 ${avatarClass(c.prenom)}`}
+              >
+                {c.prenom.charAt(0).toUpperCase()}
+              </div>
+              <p className="text-sm leading-snug flex-1 min-w-0">
+                <span className="font-semibold">{c.prenom}</span>{' '}
+                <span className="text-zinc-600">{c.texte}</span>
+              </p>
+            </div>
           ))}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex gap-2 mt-1">
+      {/* Input */}
+      <form onSubmit={handleSubmit} className="flex gap-2 items-center">
         <input
           ref={inputRef}
           type="text"
@@ -86,12 +97,12 @@ export function CommentsSection({
           onChange={(e) => setTexte(e.target.value)}
           placeholder="Ajouter un commentaire…"
           maxLength={500}
-          className="flex-1 rounded-full border border-black/20 px-3 py-1.5 text-sm outline-none focus:border-black"
+          className="flex-1 min-w-0 rounded-2xl bg-zinc-100 px-4 py-2 text-sm outline-none placeholder:text-muted focus:bg-zinc-200 transition-colors"
         />
         <button
           type="submit"
           disabled={isPending || !texte.trim()}
-          className="rounded-full bg-black px-4 py-1.5 text-sm text-white disabled:opacity-40"
+          className="shrink-0 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white disabled:opacity-40 active:scale-95 transition-all"
         >
           Envoyer
         </button>

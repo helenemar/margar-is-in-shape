@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { Flame } from 'lucide-react'
 import { toggleKudos } from '@/app/actions/feed'
 
 export function KudosButton({
@@ -38,13 +39,13 @@ export function KudosButton({
     <button
       onClick={handleClick}
       disabled={isPending}
-      className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm transition-colors ${
+      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all active:scale-95 disabled:opacity-60 ${
         kudosed
-          ? 'bg-black text-white'
-          : 'border border-black/20 text-zinc-600 hover:bg-zinc-50'
+          ? 'bg-accent text-white shadow-[0_4px_12px_rgba(255,107,74,0.35)]'
+          : 'bg-zinc-100 text-ink hover:bg-zinc-200'
       }`}
     >
-      <span>{kudosed ? '★' : '☆'}</span>
+      <Flame size={15} strokeWidth={kudosed ? 2.5 : 2} />
       <span>{count}</span>
     </button>
   )

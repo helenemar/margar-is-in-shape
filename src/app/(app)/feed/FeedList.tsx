@@ -34,7 +34,7 @@ export function FeedList({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       {checkins.map((c) => (
         <FeedCard key={c.id} checkin={c} />
       ))}
@@ -43,7 +43,7 @@ export function FeedList({
         <button
           onClick={handleLoadMore}
           disabled={isPending}
-          className="rounded-full border border-black/20 py-2.5 text-sm text-zinc-600 hover:bg-zinc-50 disabled:opacity-40"
+          className="rounded-full bg-zinc-100 py-3 text-sm font-semibold text-ink hover:bg-zinc-200 disabled:opacity-40 transition-colors"
         >
           {isPending ? 'Chargement…' : 'Charger plus'}
         </button>
