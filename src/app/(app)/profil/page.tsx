@@ -3,6 +3,7 @@ import { getProfile, createAdminClient } from '@/lib/supabase/server'
 import { PrenomForm } from './PrenomForm'
 import { AvatarForm } from './AvatarForm'
 import { PinCard } from './PinCard'
+import { LogoutButton } from '@/components/LogoutButton'
 
 export default async function ProfilPage() {
   const profile = await getProfile()
@@ -34,6 +35,12 @@ export default async function ProfilPage() {
       {/* ── PIN ── */}
       <section className="rounded-xl border border-black/10 p-5">
         <PinCard pin={pin} />
+      </section>
+
+      {/* ── Déconnexion ── */}
+      <section className="flex flex-col gap-2">
+        <p className="text-xs text-muted">Connecté en tant que {profile.prenom}</p>
+        <LogoutButton />
       </section>
     </div>
   )

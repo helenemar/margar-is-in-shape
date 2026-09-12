@@ -52,7 +52,7 @@ export async function FeedBadge() {
   if (total === 0) return null
 
   return (
-    <span className="inline-flex items-center justify-center rounded-full bg-black text-white text-xs font-semibold min-w-[18px] h-[18px] px-1 ml-1">
+    <span className="inline-flex items-center justify-center rounded-full bg-accent text-white text-[10px] font-bold min-w-[16px] h-[16px] px-1">
       {total > 99 ? '99+' : total}
     </span>
   )
