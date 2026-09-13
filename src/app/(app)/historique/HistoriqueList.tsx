@@ -3,11 +3,34 @@
 import { useState, useTransition } from 'react'
 import type { HistoriqueEntry } from '@/app/actions/historique'
 import { loadMoreHistorique } from '@/app/actions/historique'
+import {
+  Salad, Utensils, Pizza,
+  GlassWater, Wine,
+  Footprints, Dumbbell, Waves, Bike, Mountain, PersonStanding, Activity,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const ALIMENTATION_LABEL: Record<string, string> = {
   super_healthy: 'Super Healthy',
   ca_va: 'En vrai ça va',
   faute: "J'ai fauté",
+}
+
+const ALIM_ICON: Record<string, LucideIcon> = {
+  super_healthy: Salad,
+  ca_va:         Utensils,
+  faute:         Pizza,
+}
+
+function sportIcon(sport: string): LucideIcon {
+  const s = sport.toLowerCase()
+  if (s.includes('muscu') || s.includes('gym'))                              return Dumbbell
+  if (s.includes('natation') || s.includes('nage') || s.includes('piscine')) return Waves
+  if (s.includes('vélo') || s.includes('velo') || s.includes('cyclisme'))   return Bike
+  if (s.includes('escalade') || s.includes('grimpe'))                        return Mountain
+  if (s.includes('yoga') || s.includes('pilates'))                           return PersonStanding
+  if (s.includes('course') || s.includes('run') || s.includes('marche'))    return Footprints
+  return Activity
 }
 
 function formatDateFr(dateStr: string): string {
@@ -21,10 +44,11 @@ function formatDateFr(dateStr: string): string {
 }
 
 function HistoriqueCard({ entry }: { entry: HistoriqueEntry }) {
-  const sportsStr =
-    entry.activities.length > 0
-      ? entry.activities.map((a) => `${a.sport} (${a.duree_minutes} min)`).join(', ')
-      : null
+  const AlimIcon = ALIM_ICON[entry.alimentation] ?? Utensils
+  const AlcoolIcon = entry.nb_verres_alcool === 0 ? GlassWater : Wine
+  const alcoolLabel = entry.nb_verres_alcool === 0
+    ? '0 verre'
+    : `${entry.nb_verres_alcool} verre${entry.nb_verres_alcool > 1 ? 's' : ''}`
 
   return (
     <article className="rounded-xl border border-black/10 overflow-hidden">
@@ -41,25 +65,34 @@ function HistoriqueCard({ entry }: { entry: HistoriqueEntry }) {
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-medium text-sm capitalize">{formatDateFr(entry.date)}</span>
           {entry.is_late && (
-            <span className="text-xs text-zinc-400 border border-black/10 rounded-full px-2 py-0.5">
+            <span className="text-xs text-zinc-400 border border-black/10 rounded-xl px-2 py-0.5">
               rattrapé en retard
             </span>
           )}
         </div>
 
-        {/* Details row */}
-        <div className="flex flex-wrap gap-2 text-sm text-zinc-600">
-          <span className="rounded-full border border-black/10 px-2.5 py-0.5">
-            {ALIMENTATION_LABEL[entry.alimentation] ?? entry.alimentation}
-          </span>
-          <span className="rounded-full border border-black/10 px-2.5 py-0.5">
-            {entry.nb_verres_alcool === 0
-              ? '0 verre'
-              : `${entry.nb_verres_alcool} verre${entry.nb_verres_alcool > 1 ? 's' : ''}`}
-          </span>
-          {sportsStr && (
-            <span className="rounded-full border border-black/10 px-2.5 py-0.5">{sportsStr}</span>
-          )}
+        {/* Sport badges — primary info */}
+        {entry.activities.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {entry.activities.map((a) => {
+              const SportIcon = sportIcon(a.sport)
+              return (
+                <span key={a.id} className="rounded-xl bg-zinc-100 px-2.5 py-0.5 text-sm font-medium text-ink flex items-center gap-1.5">
+                  <SportIcon size={13} className="shrink-0" />
+                  {a.sport} · {a.duree_minutes} min
+                </span>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Alimentation + alcool — secondary text line */}
+        <div className="flex items-center gap-1.5 text-sm text-muted flex-wrap">
+          <AlimIcon size={15} className="shrink-0" />
+          <span>{ALIMENTATION_LABEL[entry.alimentation] ?? entry.alimentation}</span>
+          <span className="opacity-40">·</span>
+          <AlcoolIcon size={15} className="shrink-0" />
+          <span>{alcoolLabel}</span>
         </div>
 
         {/* Score */}

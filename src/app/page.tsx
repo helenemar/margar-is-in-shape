@@ -3,5 +3,5 @@ import { getProfile } from '@/lib/supabase/server'
 
 export default async function Home() {
   const profile = await getProfile()
-  redirect(profile ? '/dashboard' : '/join')
+  redirect(profile ? '/feed' : '/join')
 }

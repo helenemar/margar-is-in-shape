@@ -226,7 +226,7 @@ export function CheckinForm({ members }: { members: Member[] }) {
         return
       }
 
-      router.push('/dashboard?success=1')
+      router.push('/feed?success=1')
       router.refresh()
     } catch {
       setError('Erreur réseau, réessayez.')

@@ -26,7 +26,7 @@ export function proxy(request: NextRequest) {
 
   if (isAuthenticated && pathname === '/join') {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/feed'
     return NextResponse.redirect(url)
   }
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Newspaper, Plus, Trophy, CalendarDays, User } from 'lucide-react'
+import { Newspaper, Plus, Trophy, CalendarDays, User } from 'lucide-react'
 
 type NavItem = {
   href: string
@@ -10,12 +10,14 @@ type NavItem = {
   label: string
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard',  icon: Home,        label: 'Accueil'    },
-  { href: '/feed',       icon: Newspaper,   label: 'Fil'        },
-  { href: '/classement', icon: Trophy,      label: 'Classement' },
+const NAV_LEFT: NavItem[] = [
+  { href: '/feed',       icon: Newspaper,    label: 'Fil'        },
+  { href: '/classement', icon: Trophy,       label: 'Classement' },
+]
+
+const NAV_RIGHT: NavItem[] = [
   { href: '/historique', icon: CalendarDays, label: 'Historique' },
-  { href: '/profil',     icon: User,        label: 'Profil'     },
+  { href: '/profil',     icon: User,         label: 'Profil'     },
 ]
 
 export function BottomNav({ feedBadge }: { feedBadge: React.ReactNode }) {
@@ -26,38 +28,49 @@ export function BottomNav({ feedBadge }: { feedBadge: React.ReactNode }) {
   }
 
   return (
-    <nav
-      aria-label="Navigation principale"
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 rounded-full bg-ink px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
-    >
-      {/* Accueil + Fil — left of CTA */}
-      {NAV_ITEMS.slice(0, 2).map((item) => (
-        <NavButton
-          key={item.href}
-          item={item}
-          active={isActive(item.href)}
-          badge={item.href === '/feed' ? feedBadge : undefined}
-        />
-      ))}
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm">
 
-      {/* Central Check-in CTA */}
+      {/* ── Notch: same colour as page background, "punches" a hole in the bar ── */}
+      <div
+        className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-10 rounded-full bg-background"
+        style={{ width: 72, height: 72, top: -34 }}
+      />
+
+      {/* ── Bar ── */}
+      <nav
+        aria-label="Navigation principale"
+        className="relative flex h-[66px] items-center rounded-[22px] bg-ink px-5 shadow-[0_8px_32px_rgba(0,0,0,0.22)]"
+      >
+        {/* Left items */}
+        <div className="flex flex-1 items-center justify-around">
+          <NavButton
+            item={NAV_LEFT[0]}
+            active={isActive(NAV_LEFT[0].href)}
+            badge={feedBadge}
+          />
+          <NavButton item={NAV_LEFT[1]} active={isActive(NAV_LEFT[1].href)} />
+        </div>
+
+        {/* Spacer keeps items away from the notch */}
+        <div className="w-16 shrink-0" />
+
+        {/* Right items */}
+        <div className="flex flex-1 items-center justify-around">
+          <NavButton item={NAV_RIGHT[0]} active={isActive(NAV_RIGHT[0].href)} />
+          <NavButton item={NAV_RIGHT[1]} active={isActive(NAV_RIGHT[1].href)} />
+        </div>
+      </nav>
+
+      {/* ── Check-in button sits in the notch ── */}
       <Link
         href="/checkin"
         aria-label="Faire mon check-in"
-        className="mx-1 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-[0_4px_16px_rgba(255,107,74,0.45)] transition-transform active:scale-95"
+        className="absolute left-1/2 z-20 -translate-x-1/2 flex items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-accent shadow-[0_6px_20px_rgba(255,107,74,0.55)] transition-transform active:scale-95"
+        style={{ width: 60, height: 60, top: -28 }}
       >
         <Plus size={26} strokeWidth={2.5} className="text-white" />
       </Link>
-
-      {/* Classement + Historique + Profil — right of CTA */}
-      {NAV_ITEMS.slice(2).map((item) => (
-        <NavButton
-          key={item.href}
-          item={item}
-          active={isActive(item.href)}
-        />
-      ))}
-    </nav>
+    </div>
   )
 }
 
@@ -76,18 +89,14 @@ function NavButton({
       <Link
         href={item.href}
         aria-label={item.label}
-        className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
-          active
-            ? 'bg-white/10 text-white'
-            : 'text-muted hover:text-white'
+        className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
+          active ? 'bg-white/10 text-white' : 'text-muted hover:text-white'
         }`}
       >
         <Icon size={20} strokeWidth={active ? 2.5 : 2} />
       </Link>
       {badge && (
-        <div className="pointer-events-none absolute -right-1 -top-1">
-          {badge}
-        </div>
+        <div className="pointer-events-none absolute -right-1 -top-1">{badge}</div>
       )}
     </div>
   )

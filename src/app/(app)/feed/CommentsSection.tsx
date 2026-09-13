@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useTransition, useRef } from 'react'
+import { useState, useTransition, useRef, forwardRef, useImperativeHandle } from 'react'
 import type { FeedComment } from './types'
 import { addComment } from '@/app/actions/feed'
+
+export type CommentsSectionHandle = { expand: () => void }
 
 export const ALIMENTATION_LABEL: Record<string, string> = {
   super_healthy: 'Super Healthy',
@@ -24,15 +26,14 @@ function avatarClass(prenom: string): string {
   return AVATAR_PALETTES[prenom.charCodeAt(0) % AVATAR_PALETTES.length]
 }
 
-export function CommentsSection({
-  checkinId,
-  initialComments,
-}: {
-  checkinId: string
-  initialComments: FeedComment[]
-}) {
+export const CommentsSection = forwardRef<
+  CommentsSectionHandle,
+  { checkinId: string; initialComments: FeedComment[] }
+>(function CommentsSection({ checkinId, initialComments }, ref) {
   const [comments, setComments] = useState<FeedComment[]>(initialComments)
   const [expanded, setExpanded] = useState(false)
+
+  useImperativeHandle(ref, () => ({ expand: () => setExpanded(true) }))
   const [texte, setTexte] = useState('')
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -72,10 +73,10 @@ export function CommentsSection({
       {visible.length > 0 && (
         <div className="flex flex-col gap-2.5">
           {visible.map((c) => (
-            <div key={c.id} className="flex items-start gap-2.5">
+            <div key={c.id} className="flex items-center gap-2.5">
               {/* Avatar initiale */}
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 ${avatarClass(c.prenom)}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${avatarClass(c.prenom)}`}
               >
                 {c.prenom.charAt(0).toUpperCase()}
               </div>
@@ -110,4 +111,4 @@ export function CommentsSection({
       {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   )
-}
+})

@@ -3,9 +3,15 @@ import { getProfile, createAdminClient } from '@/lib/supabase/server'
 import { PrenomForm } from './PrenomForm'
 import { AvatarForm } from './AvatarForm'
 import { PinCard } from './PinCard'
+import { ActivityCalendar } from './ActivityCalendar'
 import { LogoutButton } from '@/components/LogoutButton'
 
-export default async function ProfilPage() {
+export default async function ProfilPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cal?: string }>
+}) {
+  const { cal } = await searchParams
   const profile = await getProfile()
   if (!profile) redirect('/join')
 
@@ -23,17 +29,23 @@ export default async function ProfilPage() {
       <h1 className="text-2xl font-semibold">Mon profil</h1>
 
       {/* ── Avatar ── */}
-      <section className="rounded-xl border border-black/10 p-5">
+      <section className="rounded-3xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] p-5">
         <AvatarForm currentAvatarUrl={profile.avatar_url} prenom={profile.prenom} />
       </section>
 
+      {/* ── Activité mensuelle ── */}
+      <section className="rounded-3xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] p-5 flex flex-col gap-1">
+        <p className="font-bold mb-3">Activité</p>
+        <ActivityCalendar profileId={profile.id} ym={cal} />
+      </section>
+
       {/* ── Prénom ── */}
-      <section className="rounded-xl border border-black/10 p-5">
+      <section className="rounded-3xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] p-5">
         <PrenomForm currentPrenom={profile.prenom} />
       </section>
 
       {/* ── PIN ── */}
-      <section className="rounded-xl border border-black/10 p-5">
+      <section className="rounded-3xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] p-5">
         <PinCard pin={pin} />
       </section>
 

@@ -60,7 +60,7 @@ export default function JoinPage() {
       return
     }
 
-    router.push('/dashboard')
+    router.push('/feed')
     router.refresh()
   }
 
@@ -101,7 +101,7 @@ export default function JoinPage() {
           <p className="text-5xl font-bold tracking-[0.2em] text-white">{createdPin}</p>
         </div>
         <button
-          onClick={() => { router.push('/dashboard'); router.refresh() }}
+          onClick={() => { router.push('/feed'); router.refresh() }}
           className="rounded-full bg-black px-8 py-3 text-sm font-medium text-white"
         >
           Commencer le défi
